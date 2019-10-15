@@ -52,32 +52,14 @@ nn_architecture = [
 ]
 
 if __name__ == "__main__":
-    f = open('result.txt', 'w')
     network_now = network(nn_architecture, True)
     train_x = train_set_x[:, 0:10000]
     train_y = train_labels_onehot[:, 0:10000]
     test_x = test_set_x
     test_y = test_labels
-    network_now.alpha, network_now.belta = 0.5, 0.5
     parameters = network_now.L_layer_model(train_x, train_y, learning_rate=0.1, num_iterations=1500, print_cost=True)
-    fw = open('sigmoid.txt'.format(network_now.alpha, network_now.belta), 'wb')
     pickle.dump(network_now.result, fw, -1)
-
     acc = network_now.predict(test_x, test_y, parameters)
     print('---------')
     print(acc)
     print('---------')
-    #f.write('alpha belta accuracy \n')
-    # for i in range(10):
-    #     for j in range(10):
-    #         alpha, belta = i/10, j/10
-    #         network_now.alpha, network_now.belta = alpha, belta
-    #         parameters = network_now.L_layer_model(train_x, train_y, learning_rate=0.1, num_iterations=1000, print_cost=True)
-    #         acc = network_now.predict(test_x, test_y, parameters)
-    #         print("--------------------------")
-    #         print(acc)
-    #         print('--------------------------')
-    #         line = ' '.join([str(alpha), str(belta), str(acc)]) + '\n'
-    #         f.write(line)
-    #         print(line)
-    # f.close()
