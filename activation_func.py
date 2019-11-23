@@ -34,17 +34,6 @@ def prelu(Z, alpha):
     return R
 
 
-def prelu_backward(dA, Z, alpha):
-    rate = 0.9
-    dZ = np.array(dA.T, copy=True)
-    dalpha = np.array(alpha, copy=True)
-    indexs = np.where(Z.T < 0)
-    for index, x in enumerate(indexs[0]):
-        y = indexs[1][index]
-        dalpha_y_cur = dalpha[y]
-        dZ[x, y] = dalpha[y]
-        dalpha[y] = (1-rate)*Z.T[x, y]*dZ[x, y]+rate*dalpha_y_cur
-    return dZ.T, dalpha
 
 
 def tanh_relu(x, alpha=0.5):
@@ -68,11 +57,38 @@ def sigmoid_relu(x, alpha=0.5):
 
 
 def sigmoid_relu_backward(dA, Z, alpha):
+    rate = 0.9
     dZ = np.array(dA, copy=True)
-    S = sigmoid_relu(Z)
-    dS = alpha*S * (1 - S)
-    np.where(np.less(dZ, 0), dZ, dS)
+    dalpha = np.array(alpha,copy=True)
+    indexs_1 = np.where(Z.T<0)
+    indexs_2 = np.where(Z.T>=0)
+    for index,x in enumerate(indexs_1[0]):
+        y = indexs_1[1][index]
+        dalpha_y_cur = dalpha[y]
+        S = sigmoid(Z[x, y])
+        dZ[x, y] = S * (1 - S)
+        dalpha[y] = (1 - rate) * Z.T[x, y] * dZ[x, y] + rate * dalpha_y_cur
+    for index, x in enumerate(indexs_2[0]):
+        y = indexs_2[1][index]
+        dZ[x, y] = 1
     return dZ
+
+
+def prelu_backward(dA, Z, alpha):
+    rate = 0.9
+    dZ = np.array(dA.T, copy=True)
+    dalpha = np.array(alpha, copy=True)
+    indexs_1 = np.where(Z.T < 0)
+    indexs_2 = np.where(Z.t>=0)
+    for index, x in enumerate(indexs_1[0]):
+        y = indexs_1[1][index]
+        dalpha_y_cur = dalpha[y]
+        dZ[x, y] = dalpha[y]
+        dalpha[y] = (1-rate)*Z.T[x, y]*dZ[x, y]+rate*dalpha_y_cur
+    for index, x in enumerate(indexs_2[0]):
+        y = indexs_2[1][index]
+        dZ[x, y] = 1
+    return dZ.T, dalpha
 
 
 
